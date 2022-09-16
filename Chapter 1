@@ -1,0 +1,135 @@
+install.packages('wooldridge')
+library(wooldridge)
+
+# Chapter 1 
+# Computer Exercises
+# C1
+head(wage1,3)
+help(wage1)
+
+# 1) education level
+summary(wage1$educ)
+c(mean(wage1$educ),max(wage1$educ),min(wage1$educ))
+# 2) average hourly wage
+mean(wage1$wage)
+# 3) female
+table(wage1$female)
+
+# C2
+head(bwght,3)
+help(bwght)
+
+# 1) smocking during pregnancy
+length(bwght$cigs)
+length(bwght$cigs[bwght$cigs>0])
+# 2) average number of cigarettes smoked per day
+mean(bwght$cigs)
+# 3) smoker's average
+mean(bwght$cigs[bwght$cigs>0])
+# 4) average fatheduc
+length(bwght$fatheduc)
+table(is.na(bwght$fatheduc))
+mean(bwght$fatheduc, na.rm = T)
+# 5) average and sd of family income 
+mean(bwght$faminc)
+sd(bwght$faminc)
+
+# C3
+head(meap01,3)
+help(meap01)
+
+# 1) largest and smallest values of math4
+c(max(meap01$math4), min(meap01$math4))
+summary(meap01$math4)
+# 2) schools with perfect pass rate
+length(meap01$math4[meap01$math4==100])
+length(meap01$math4[meap01$math4==100])/length(meap01$math4)
+# 3) schools with exactly 50% pass rate
+length(meap01$math4[meap01$math4==50])
+# 4) compare average pass rates of math and reading
+mean(meap01$math4)
+mean(meap01$read4)
+with(meap01,mean(math4)>mean(read4))
+help(with)
+# 5) correlation between math4 and read4
+cor(meap01$math4,meap01$read4)
+with(meap01, cor(math4,read4))
+# 6) average and sd of exppp
+mean(meap01$exppp)
+sd(meap01$exppp)
+with(meap01, c(mean(exppp),sd(exppp)))
+plot(meap01$lexpend)
+
+# C4
+head(jtrain2,3)
+str(jtrain2)
+help(jtrain2)
+
+# 1) fraction of men who received job training
+table(jtrain2$train)
+with(jtrain2,length(train[train==1])/length(train))
+# 2) average of re78 for trained and untrained groups
+length(jtrain2$re78)
+aggregate(jtrain2$re78,by=jtrain2[c('train')],FUN=mean)
+help(aggregate)
+# 3) fraction of unemployed men who received training
+with(jtrain2,table(unem78,train))
+prop.table(with(jtrain2,table(unem78,train)),2)
+help(prop.table)
+
+# C5
+head(fertil2,3)
+help(fertil2)
+
+# 1) average, smallest and largest values of children
+summary(fertil2$children)
+# 2) percentage of women have electricity
+table(fertil2$electric)
+with(fertil2,length(electric[electric==1])/length(electric))
+# 3) average of children with and without electricity
+with(fertil2,table(electric,children))
+mean(fertil2$children)
+aggregate(fertil2$children,by=fertil2[c('electric')],FUN=mean)
+
+# C6
+head(countymurders,3)
+help(countymurders)
+
+# 1)  0 murders and 0 executions countries in 1996 
+data <- subset(countymurders,year==1996)
+with(data,length(countyid))
+with(data,length(countyid[murders==0]))
+with(data,length(countyid[execs==0]))
+# 2) largest number of murders and executions in 1996
+max(data$murders)
+max(data$execs)
+mean(data$execs)
+# 3) correlation coefficient between murders and execs
+cor(data$murders,data$execs)
+
+# C7
+head(alcohol,3)
+??alconol
+str(wooldridge::alcohol)	
+
+# 1) percentage of alcohol abusers
+table(alcohol$abuse)
+with(alcohol,length(abuse[abuse==1])/length(abuse))
+# 2) employment rate of alcohol abusers
+with(alcohol,table(abuse,status))
+abusers <- subset(alcohol,abuse==1)
+with(abusers,length(abuse[status==3])/length(abuse))
+# 3) employment rate of sobers
+sobers <- subset(alcohol,abuse==0)
+with(sobers,length(abuse[status==3])/length(abuse))
+
+# C8
+head(econmath,3)
+help(econmath)
+
+# 1) students taking an economics course
+table(econmath$econhs)
+with(econmath,length(econhs[econhs==1]))
+# 2) average score of students who did and did not take economics
+with(econmath,mean(score[econhs==1]))
+with(econmath,mean(score[econhs==0]))
