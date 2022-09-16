@@ -1,0 +1,265 @@
+# Chapter 2 The Simple Regression Model
+
+library(wooldridge)
+
+head(ceosal1,3)
+str(ceosal1)
+sal <- lm(salary~roe,data = ceosal1)
+plot(sal)
+
+head(wage1,3)
+mean(wage1$wage)
+
+y <- lm(wage1$wage~wage1$educ)
+summary(y)
+summary(y)["r.squared"]
+
+z <- lm(log(wage1$wage)~wage1$educ)
+summary(z)
+summary(z)[c("r.squared", "adj.r.squared")]
+
+# Problems
+# 3
+Students <- c(1:8)
+GPA <- c(2.8,3.4,3.0,3.5,3.6,3.0,2.7,3.7)
+ACT <- c(21,24,26,27,29,25,25,30)
+data <- data.frame(Students,GPA,ACT)
+
+# 1) Estimate the relationship between GPA and ACT using OLS
+# method a)
+beta_1 <- cov(ACT,GPA)/var(ACT)
+beta_0 <- mean(GPA)-beta_1*mean(ACT)
+c(beta_0,beta_1)
+# method b)
+ols_1 <- lm(GPA~ACT,data = data)
+summary(ols_1)
+summary(ols_1)$coefficients
+# method c)
+lsfit(ACT,GPA)$coefficients
+help(lsfit)
+# 2) Compute the fitted values and residuals
+# method a)
+fitted_value <- beta_0 + ACT*beta_1
+residuals <- GPA - fitted_value
+# method b)
+fitted(ols_1)
+residuals(ols_1)
+# 3) When ACT = 20
+beta_0 + 20*beta_1
+# 4) How much does ACT explains the GPA (R-suqared value)
+# method a) R^2=1-SSR/SST
+R2 <- 1-(sum(residuals^2)/sum((GPA-mean(GPA))^2))
+R2
+# method b)
+summary(ols_1)$r.squared
+
+# 4
+head(bwght,3)
+help(bwght)
+length(bwght$parity)
+bwght <- lm(bwght~cigs,data = bwght)
+summary(bwght)$coefficients
+
+# 1) The predicted birth weight when cigs = 0 and 70
+a <- data.frame(cigs = c(0,70))
+result <-  predict(bwght,a)
+predict(bwght,a)
+help(predict)
+# 3) Predict cigs when birth weight = 125
+coef(bwght)
+b1 <- bwght$coefficients['cigs']
+b0 <- bwght$coefficients['(Intercept)']
+(125 - b0)/b1
+
+# 5
+# cons = -124.84 + 0.853 * inc
+# n = 100, R^2 = 0.692
+# MPC(slop): marginal propensity to consume
+# APC(cons/inc): average propensity to consume
+
+# 2) The predicted consumption when income is $30,000
+-124.84 + 0.853 * 30000
+# 3) Draw estimated MPC and APC
+inc <- c(1:100)
+cons = -124.84 + 0.853 * inc
+MPC <- 0.853
+APC <- cons/inc
+plot(inc,APC,type = 'l')
+abline(h=MPC)
+
+# Computer Exercises
+# C1
+View(k401k)
+head(k401k,3)
+help(k401k)
+
+# 1) The average participation rate and the average match rate
+mean(k401k$prate)
+mean(k401k$mrate)
+# 2) Estimate the SLR
+prate <- lm(prate~mrate,data = k401k)
+summary(prate)$coefficients
+summary(prate)$r.squared
+# 4) Predict prate when mrate = 3.5
+predict(prate,data.frame(mrate=3.5))
+
+# C2
+head(ceosal2,3)
+help(ceosal2)
+
+# 1) The average salary and the average tenure
+c(mean(ceosal2$salary),mean(ceosal2$ceoten))
+# 2) The numbers of CEOs in their first year; the longest tenure as CEO
+with(ceosal2,length(ceoten[ceoten==0]))
+max(ceosal2$ceoten)
+# 3) log(salary) = beta_0 + beta_1 * ceoten + u
+log_salary <- lm(lsalary~ceoten,data = ceosal2)
+coef(log_salary)
+
+# C3
+head(sleep75,3)
+help(sleep75)
+sleep <- lm(sleep~totwrk,data = sleep75)
+
+# 1) intercept and R^2
+summary(sleep)[c('coefficients','r.squared')]
+# 2) If totwrk increases by 2 hours, how much is sleep estimated to fall
+coef(sleep)
+sleep$coefficients['totwrk']*2
+
+# C4
+head(wage2,3)
+help(wage2)
+
+# 1) The average salary and average IQ
+with(wage2,c(mean(wage),mean(IQ)))
+# 2) SLR of IQ and wage; predict increase of wage when IQ raises 15; R^2
+wage <- lm(wage~IQ,data = wage2)
+summary(IQ_wage)$r.squared
+coef(wage)
+p <- 15 * wage$coefficients['IQ']
+p
+# 3.1) Log regression between wage and IQ 
+lwage <- lm(lwage~IQ, wage2)
+coef(lwage)
+summary(lwage)$r.squared
+# 3.2) percentage increase of wage when IQ increased by 15
+q <- 15 * lwage$coefficients['IQ']
+q
+
+# C5
+head(rdchem,3)
+help(rdchem)
+
+# 1) SLR of rd and sales
+rd <- lm(rd~sales,data = rdchem)
+rd$coefficients['sales']
+# 2) Estimate the model
+summary(rd)$r.squared
+
+# C6
+head(meap93,3)
+help(meap93)
+
+# 2) math10 = beta_0 + beta_1 * log(expend) + u
+math10 <- lm(math10~lexpend,data = meap93)
+coef(math10)
+0.1 * math10$coefficients['lexpend']
+# 3) estimate the model
+dim(meap93)
+summary(math10)$r.squared
+
+# c7
+head(charity,3)
+help(charity)
+
+# 1) The average of gifts; percentage of people without gift
+mean(charity$gift)
+with(charity,length(gift[gift==0])/length(gift))
+# 2) The average of mailings per year; and its max and min
+with(charity,c(mean(mailsyear),min(mailsyear),max(mailsyear)))
+# 3) gift = beta_0 + beta_1 * mailsyear + u
+gift <- lm(gift~mailsyear,data = charity)
+dim(charity)               
+summary(gift)$r.squared
+# 4) The coefficients
+coef(gift)
+# 5) The smallest prediction
+m <- min(charity$mailsyear)
+m
+predict(gift,data.frame(mailsyear=m))
+
+# C8
+# Create 500 xi with uniform distribution with range[0,10]
+x <- rnorm(500)*10
+help(rnorm)
+str(x)
+
+# 1) The mean and sd of x
+mean(x)
+sd(x)
+summary(x)
+# 2.1) Create 500 ui from the Normal(0,36) 
+u <- rnorm(500)*6
+# 2.2) The mean and sd of u
+c(mean(u),sd(u))
+# 3) yi = 1 + 2xi + ui == beta_0 + beta_1 * xi + ui
+y <- 1 + 2*x + u
+fit <- lm(y~x)  
+coef(fit)
+summary(fit)$r.squared
+# 4) sum(u_hat) and sum(x * u_hat)
+u_hat <- fit$residuals
+sum(u_hat)
+sum(x * u_hat)
+# 5) sum(u) and sum(x * u)
+sum(u)
+sum(x * u)
+
+# C9
+head(countymurders,3)
+help(countymurders)
+data <- subset(countymurders,year==1996)
+
+# 1) counties had 0 murders in 1996
+with(data,length(countyid[murders==0]))
+with(data,length(countyid[murders>0]))
+max(data$murders)
+# 2) murders = beta_0 + beta_1 * execs + u
+murders <- lm(murders~execs,data = data)
+dim(data)
+summary(murders)$r.squared
+# 3) Coefficients
+coef(murders)
+# 4) smallest number on murders that can be predicted
+min(data$execs)
+predict(murders,data.frame(execs=min(data$execs)))
+
+# C10
+head(catholic,3)
+help(catholic)
+
+# 1) Students number; mean and sd of math12 and read12
+dim(catholic)
+with(catholic,c(length(id),mean(math12),sd(math12),mean(read12),sd(read12)))
+# 2) math12 = beta_0 + beta_1 * read12
+math <- lm(math12~read12,data = catholic)
+n <- length(catholic$id)
+n
+summary(math)$r.squared
+# 3) coefficients
+coef(math)
+
+# C11
+head(gpa1,3)
+help(gpa1)
+
+# 1) Students number; average and highest GPA
+with(gpa1,c(length(age),mean(colGPA),max(colGPA)))
+# 2) Students who own PC
+table(gpa1$PC)
+# 3) colGPA = beta_0 + beta_1 * PC + u
+gpa <- lm(colGPA~PC,data = gpa1)
+coef(gpa)
+# 4) R^2
+summary(gpa)$r.squared
